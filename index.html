@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Webseite</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <nav class="navbar">
+      <span class="logo">Web_open</span>
+      <button id="theme-toggle" class="theme-toggle" aria-label="Farbmodus wechseln">🌙</button>
+    </nav>
+    <div class="hero-content">
+      <h1>Kleine Test Webseite</h1>
+      <p>Dies ist eine einfache statische Seite aus HTML, CSS und JavaScript.</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Über diese Seite</h2>
+      <p>
+        Diese Seite dient als Test, um zu zeigen, dass HTML, CSS und JavaScript
+        zusammen funktionieren. Kein Build-Tool, kein Framework – einfach im
+        Browser öffnen.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Interaktiver Zähler</h2>
+      <p>Klicke auf den Button, um den Zähler hochzuzählen:</p>
+      <div class="counter">
+        <button id="counter-btn">Klick mich 👆</button>
+        <span id="counter-value">0</span>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Web_open — Test Webseite</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
