@@ -6,6 +6,7 @@ import { load } from '../logic/storage.js';
 import { pickSession, recordAnswer, getEntry, boxCounts, masteredQuestions } from '../logic/srs.js';
 import { addXp, touchStreak, checkBadges, recordStat, XP } from '../logic/gamification.js';
 import { TOPICS, QUESTIONS } from '../data/questions.js';
+import { getAllQuestions, CUSTOM_TOPIC } from '../logic/customQuestions.js';
 import { renderScenario } from '../svg/scenarios.js';
 import { showToast, announce, updateHeaderXp } from '../app.js';
 
@@ -63,7 +64,7 @@ function renderOverview(container) {
   card.appendChild(legend);
   container.appendChild(card);
 
-  const session = pickSession(QUESTIONS, SESSION_SIZE);
+  const session = pickSession(getAllQuestions(), SESSION_SIZE);
   const dueNow = session.filter((q) => {
     const e = getEntry(q.id);
     return e && e.due <= Date.now();
@@ -87,7 +88,7 @@ function renderOverview(container) {
     empty.innerHTML = `<div class="empty-icon">🌅</div><p><strong>Alles gelernt für heute!</strong><br>Keine Karten fällig und keine neuen Fragen übrig.</p>`;
     container.appendChild(empty);
 
-    if (masteredQuestions(QUESTIONS).length > 0) {
+    if (masteredQuestions(getAllQuestions()).length > 0) {
       const repeat = document.createElement('button');
       repeat.className = 'btn btn-secondary btn-block';
       repeat.textContent = 'Box-5-Karten freiwillig wiederholen';
@@ -101,8 +102,8 @@ function renderOverview(container) {
 
 function startSession(container, masteredOnly) {
   const cards = masteredOnly
-    ? shuffle(masteredQuestions(QUESTIONS)).slice(0, SESSION_SIZE)
-    : pickSession(QUESTIONS, SESSION_SIZE);
+    ? shuffle(masteredQuestions(getAllQuestions())).slice(0, SESSION_SIZE)
+    : pickSession(getAllQuestions(), SESSION_SIZE);
 
   if (!cards.length) {
     location.hash = '#/karten';
@@ -143,7 +144,9 @@ function renderCard(container, session) {
   const entry = getEntry(q.id);
   const status = document.createElement('div');
   status.className = 'flash-status';
-  const topicName = TOPICS[q.topic] ? `${TOPICS[q.topic].icon} ${TOPICS[q.topic].name}` : '';
+  const topicName = TOPICS[q.topic]
+    ? `${TOPICS[q.topic].icon} ${TOPICS[q.topic].name}`
+    : `${CUSTOM_TOPIC.icon} ${CUSTOM_TOPIC.name}`;
   status.innerHTML = `
     <span>${topicName}</span>
     <span class="flash-badge${entry && entry.wrong > entry.correct ? ' again' : ''}">${entry ? `Box ${entry.box}` : 'Neu'}</span>

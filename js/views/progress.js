@@ -4,6 +4,7 @@ import { load, reset } from '../logic/storage.js';
 import { currentRank } from '../logic/gamification.js';
 import { TOPICS, QUESTIONS } from '../data/questions.js';
 import { BADGES } from '../data/badges.js';
+import { customCount } from '../logic/customQuestions.js';
 import { render as rerenderApp } from '../app.js';
 
 export function render(container) {
@@ -83,6 +84,27 @@ export function render(container) {
     grid.appendChild(item);
   }
   container.appendChild(grid);
+
+  /* Privater Bereich */
+  const privTitle = document.createElement('div');
+  privTitle.className = 'section-title';
+  privTitle.textContent = 'Privater Bereich';
+  container.appendChild(privTitle);
+
+  const privCard = document.createElement('div');
+  privCard.className = 'card';
+  const privInfo = document.createElement('p');
+  privInfo.className = 'page-subtitle';
+  privInfo.style.marginBottom = '10px';
+  privInfo.textContent = `🔒 ${customCount()} eigene Fragen gespeichert – nur auf diesem Gerät, nie im Internet.`;
+  privCard.appendChild(privInfo);
+  const privBtn = document.createElement('a');
+  privBtn.className = 'btn btn-secondary btn-block';
+  privBtn.style.textDecoration = 'none';
+  privBtn.href = '#/import';
+  privBtn.textContent = 'Eigene Fragen importieren / bearbeiten';
+  privCard.appendChild(privBtn);
+  container.appendChild(privCard);
 
   /* Reset */
   const resetTitle = document.createElement('div');
