@@ -21,6 +21,7 @@ export const XP = {
   ROUND_DONE: 20,
   ROUND_PERFECT_BONUS: 50,
   EXAM_PASSED: 100,
+  SHEET_PASSED: 40,
 };
 
 export function currentRank() {

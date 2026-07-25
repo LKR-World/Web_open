@@ -13,6 +13,7 @@ function defaultState() {
     stats: {
       perTopic: {},      // topicId -> { correct, wrong }
       perQuestion: {},   // questionId -> { correct, wrong } (für Themen-Badges: mind. 1x richtig)
+      sheets: {},        // Bogen-Nr -> { attempts, best (0..1), passed }
       examsPassed: 0,
       examsTaken: 0,
       perfectRounds: 0,

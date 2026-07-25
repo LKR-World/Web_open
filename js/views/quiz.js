@@ -10,6 +10,10 @@ import { showToast, announce, updateHeaderXp } from '../app.js';
 const ROUND_SIZE = 10;
 const EXAM_SIZE = 30;
 const EXAM_PASS = 0.8;
+const SHEET_COUNT = 15;
+const SHEET_PASS = 0.75;
+// Themenmix pro Übungsbogen (20 Fragen)
+const SHEET_PLAN = { vorfahrt: 4, zeichen: 3, lichter: 3, manoever: 3, sicherheit: 3, notfall: 2, allgemein: 2 };
 
 function shuffle(arr) {
   const a = [...arr];
@@ -20,13 +24,84 @@ function shuffle(arr) {
   return a;
 }
 
+/* Deterministische Übungsbögen: Bogen N enthält immer dieselben Fragen. */
+function mulberry32(seed) {
+  let a = seed | 0;
+  return function () {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function seededShuffle(arr, rnd) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rnd() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+export function sheetQuestions(n) {
+  const rnd = mulberry32(7000 + n * 131);
+  const picked = [];
+  for (const [topic, count] of Object.entries(SHEET_PLAN)) {
+    const pool = QUESTIONS.filter((q) => q.topic === topic);
+    picked.push(...seededShuffle(pool, rnd).slice(0, count));
+  }
+  return seededShuffle(picked, rnd);
+}
+
 export function render(container, params) {
   const mode = params[0];
   if (!mode) {
     renderTopicChooser(container);
+  } else if (mode === 'boegen') {
+    renderSheetList(container);
   } else {
     startQuiz(container, mode);
   }
+}
+
+/* ============ Übungsbögen-Übersicht ============ */
+
+function renderSheetList(container) {
+  const sheets = load().stats.sheets || {};
+  const passedCount = Object.values(sheets).filter((s) => s.passed).length;
+  container.innerHTML = `
+    <h1 class="page-title">Übungsbögen</h1>
+    <p class="page-subtitle">15 feste Bögen à 20 Fragen aus allen Themen – bestanden ab ${Math.round(SHEET_PASS * 100)} %. Geschafft: ${passedCount} / ${SHEET_COUNT}</p>
+  `;
+  const list = document.createElement('div');
+  list.className = 'topic-list';
+  for (let n = 1; n <= SHEET_COUNT; n++) {
+    const s = sheets[n];
+    const tile = document.createElement('button');
+    tile.className = 'topic-tile';
+    const status = s
+      ? (s.passed ? '✅' : '🔁')
+      : '📄';
+    const meta = s
+      ? `Beste: ${Math.round(s.best * 100)} % · ${s.attempts}× versucht`
+      : '20 Fragen · noch offen';
+    tile.innerHTML = `
+      <span class="topic-icon">${status}</span>
+      <span class="topic-name">Bogen ${n}</span>
+      <span class="topic-meta">${meta}</span>
+    `;
+    tile.addEventListener('click', () => { location.hash = `#/lernen/bogen-${n}`; });
+    list.appendChild(tile);
+  }
+  container.appendChild(list);
+
+  const back = document.createElement('a');
+  back.className = 'btn btn-secondary btn-block';
+  back.style.cssText = 'text-decoration:none;margin-top:14px;';
+  back.href = '#/lernen';
+  back.textContent = 'Zurück zur Themenwahl';
+  container.appendChild(back);
 }
 
 /* ============ Themenauswahl ============ */
@@ -59,6 +134,13 @@ function renderTopicChooser(container) {
     list.appendChild(tile);
   }
 
+  const sheets = document.createElement('button');
+  sheets.className = 'topic-tile topic-tile-wide';
+  const passedCount = Object.values(load().stats.sheets || {}).filter((s) => s.passed).length;
+  sheets.innerHTML = `<span class="topic-icon">🗂️</span><div><div class="topic-name">Übungsbögen</div><div class="topic-meta">${SHEET_COUNT} feste Bögen à 20 Fragen · ${passedCount} / ${SHEET_COUNT} bestanden</div></div>`;
+  sheets.addEventListener('click', () => { location.hash = '#/lernen/boegen'; });
+  list.appendChild(sheets);
+
   const exam = document.createElement('button');
   exam.className = 'topic-tile topic-tile-wide topic-tile-exam';
   exam.innerHTML = `<span class="topic-icon">🎓</span><div><div class="topic-name">Prüfungssimulation</div><div class="topic-meta">${EXAM_SIZE} Fragen aus allen Themen – bestanden ab ${Math.round(EXAM_PASS * 100)} %</div></div>`;
@@ -75,7 +157,16 @@ function startQuiz(container, mode) {
   let title;
   const isExam = mode === 'pruefung';
 
-  if (isExam) {
+  let sheetNumber = null;
+  if (/^bogen-\d+$/.test(mode)) {
+    sheetNumber = parseInt(mode.slice(6), 10);
+    if (sheetNumber < 1 || sheetNumber > SHEET_COUNT) {
+      location.hash = '#/lernen/boegen';
+      return;
+    }
+    pool = sheetQuestions(sheetNumber);
+    title = `Bogen ${sheetNumber}`;
+  } else if (isExam) {
     pool = shuffle(QUESTIONS).slice(0, EXAM_SIZE);
     title = 'Prüfungssimulation';
   } else if (mode === 'alle') {
@@ -96,6 +187,7 @@ function startQuiz(container, mode) {
     wrong: 0,
     xpGained: 0,
     isExam,
+    sheet: sheetNumber,
     title,
   };
   renderQuestion(container, session);
@@ -251,6 +343,16 @@ function finishRound(container, session) {
       state.stats.examsPassed += 1;
       bonus += XP.EXAM_PASSED;
     }
+  } else if (session.sheet) {
+    const score = session.correct / total;
+    passed = score >= SHEET_PASS;
+    const prev = state.stats.sheets[session.sheet] || { attempts: 0, best: 0, passed: false };
+    state.stats.sheets[session.sheet] = {
+      attempts: prev.attempts + 1,
+      best: Math.max(prev.best, score),
+      passed: prev.passed || passed,
+    };
+    if (passed) bonus += XP.SHEET_PASSED;
   }
   save();
 
@@ -264,7 +366,13 @@ function finishRound(container, session) {
   screen.className = 'result-screen';
 
   let emoji, titleText, subText;
-  if (session.isExam) {
+  if (session.sheet) {
+    emoji = passed ? '✅' : '🔁';
+    titleText = passed ? `Bogen ${session.sheet} bestanden!` : `Bogen ${session.sheet}: noch nicht bestanden`;
+    subText = passed
+      ? `${pct} % – dieser Bogen ist im Kasten.`
+      : `Du brauchst mindestens ${Math.round(SHEET_PASS * 100)} %. Der Bogen bleibt gleich – beim nächsten Anlauf kennst du ihn besser.`;
+  } else if (session.isExam) {
     emoji = passed ? '🎓' : '🌊';
     titleText = passed ? 'Bestanden!' : 'Noch nicht bestanden';
     subText = passed
@@ -294,7 +402,9 @@ function finishRound(container, session) {
 
   const again = document.createElement('button');
   again.className = 'btn btn-primary btn-block';
-  again.textContent = session.isExam ? 'Simulation wiederholen' : 'Noch eine Runde';
+  again.textContent = session.sheet
+    ? `Bogen ${session.sheet} wiederholen`
+    : (session.isExam ? 'Simulation wiederholen' : 'Noch eine Runde');
   // hashchange feuert bei identischem Hash nicht – Runde deshalb direkt neu starten
   again.addEventListener('click', () => {
     const viewContainer = document.getElementById('view');
@@ -305,8 +415,8 @@ function finishRound(container, session) {
   const back = document.createElement('a');
   back.className = 'btn btn-secondary btn-block';
   back.style.cssText = 'text-decoration:none;margin-top:10px;';
-  back.href = '#/lernen';
-  back.textContent = 'Zur Themenwahl';
+  back.href = session.sheet ? '#/lernen/boegen' : '#/lernen';
+  back.textContent = session.sheet ? 'Zur Bögen-Übersicht' : 'Zur Themenwahl';
 
   screen.appendChild(again);
   screen.appendChild(back);
@@ -314,6 +424,7 @@ function finishRound(container, session) {
 }
 
 function sessionModeOf(session) {
+  if (session.sheet) return `bogen-${session.sheet}`;
   if (session.isExam) return 'pruefung';
   const topic = Object.values(TOPICS).find((t) => t.name === session.title);
   return topic ? topic.id : 'alle';
