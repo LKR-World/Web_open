@@ -5,12 +5,14 @@ import * as home from './views/home.js';
 import * as quiz from './views/quiz.js';
 import * as flashcards from './views/flashcards.js';
 import * as progress from './views/progress.js';
+import * as importer from './views/importer.js';
 
 const routes = {
   home,
   lernen: quiz,
   karten: flashcards,
   fortschritt: progress,
+  import: importer,
 };
 
 function parseHash() {

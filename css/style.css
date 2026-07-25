@@ -459,6 +459,39 @@ h1.page-title { font-size: 1.35rem; margin-bottom: 4px; color: var(--navy); }
 .toast-sub { font-size: 0.78rem; opacity: 0.85; }
 .toast.gold { background: linear-gradient(135deg, #b8860b, var(--gold)); }
 
+/* ============ Import (privater Bereich) ============ */
+.import-area {
+  width: 100%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  border: 2px solid #e3ddd0;
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  color: var(--ink);
+  background: #fbfaf6;
+  resize: vertical;
+}
+.import-area:focus { outline: none; border-color: var(--blue); }
+.error-box {
+  margin-top: 10px;
+  background: var(--red-light);
+  border-left: 4px solid var(--red);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  color: var(--red);
+}
+.ok-box {
+  margin-top: 10px;
+  background: var(--green-light);
+  border-left: 4px solid var(--green);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  color: var(--green);
+}
+
 /* ============ Leerzustände ============ */
 .empty-state { text-align: center; padding: 34px 16px; color: var(--ink-soft); }
 .empty-state .empty-icon { font-size: 2.6rem; margin-bottom: 8px; }

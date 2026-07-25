@@ -223,6 +223,16 @@ function signSymbol(symbol) {
         fill: 'none', stroke, 'stroke-width': '1.8',
       }));
       break;
+    case 'windsurf':
+      g.appendChild(el('circle', { cx: -4, cy: -12, r: 2.8, fill: stroke }));
+      g.appendChild(el('path', {
+        d: 'M-4,-9 L-4,-1 L-1,4 M-4,-5 L2,-8',
+        fill: 'none', stroke, 'stroke-width': '2.2', 'stroke-linecap': 'round',
+      }));
+      g.appendChild(el('path', { d: 'M4,-14 C10,-8 10,0 6,6 L4,-14 Z', fill: stroke }));
+      g.appendChild(el('line', { x1: 4, y1: -14, x2: 3, y2: 8, stroke, 'stroke-width': '1.6' }));
+      g.appendChild(el('path', { d: 'M-11,9 L11,9 L8,12.5 L-8,12.5 Z', fill: stroke }));
+      break;
     case 'pfeil':
       g.appendChild(el('path', {
         d: 'M-12,0 L8,0 M8,0 L1,-6 M8,0 L1,6',

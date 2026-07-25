@@ -4,6 +4,7 @@ import { load, save } from '../logic/storage.js';
 import { recordAnswer, getEntry } from '../logic/srs.js';
 import { addXp, touchStreak, checkBadges, recordStat, XP, topicMastery } from '../logic/gamification.js';
 import { TOPICS, QUESTIONS } from '../data/questions.js';
+import { loadCustom, customCount, CUSTOM_TOPIC } from '../logic/customQuestions.js';
 import { renderScenario } from '../svg/scenarios.js';
 import { showToast, announce, updateHeaderXp } from '../app.js';
 
@@ -134,6 +135,14 @@ function renderTopicChooser(container) {
     list.appendChild(tile);
   }
 
+  if (customCount() > 0) {
+    const own = document.createElement('button');
+    own.className = 'topic-tile topic-tile-wide';
+    own.innerHTML = `<span class="topic-icon">${CUSTOM_TOPIC.icon}</span><div><div class="topic-name">${CUSTOM_TOPIC.name}</div><div class="topic-meta">${customCount()} Fragen · nur auf diesem Gerät</div></div>`;
+    own.addEventListener('click', () => { location.hash = '#/lernen/eigene'; });
+    list.appendChild(own);
+  }
+
   const sheets = document.createElement('button');
   sheets.className = 'topic-tile topic-tile-wide';
   const passedCount = Object.values(load().stats.sheets || {}).filter((s) => s.passed).length;
@@ -169,6 +178,13 @@ function startQuiz(container, mode) {
   } else if (isExam) {
     pool = shuffle(QUESTIONS).slice(0, EXAM_SIZE);
     title = 'Prüfungssimulation';
+  } else if (mode === 'eigene') {
+    pool = shuffle(loadCustom()).slice(0, ROUND_SIZE);
+    title = CUSTOM_TOPIC.name;
+    if (!pool.length) {
+      location.hash = '#/import';
+      return;
+    }
   } else if (mode === 'alle') {
     pool = shuffle(QUESTIONS).slice(0, ROUND_SIZE);
     title = 'Alle Themen';
@@ -426,6 +442,7 @@ function finishRound(container, session) {
 function sessionModeOf(session) {
   if (session.sheet) return `bogen-${session.sheet}`;
   if (session.isExam) return 'pruefung';
+  if (session.title === CUSTOM_TOPIC.name) return 'eigene';
   const topic = Object.values(TOPICS).find((t) => t.name === session.title);
   return topic ? topic.id : 'alle';
 }

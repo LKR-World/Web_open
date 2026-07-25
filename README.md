@@ -20,8 +20,11 @@ Prüfungskatalog, sondern trainieren das Verständnis der Regeln.
   Schifffahrtszeichen und Lichterführung als Grafiken
 - **🏅 Gamification** – XP, nautische Ränge (Moses → Kapitän), Abzeichen und
   Tages-Streak
+- **🔒 Privater Bereich** – eigene Fragen als JSON importieren; sie bleiben
+  ausschliesslich im Browser-Speicher des Geräts (nie im Repo, nie online)
+  und laufen in Quiz und Karteikarten normal mit
 
-## Themen (157 Fragen)
+## Themen (300 Fragen)
 
 Vorfahrtsregeln · Schifffahrtszeichen · Lichterführung · Manöver & Fahrregeln ·
 Sicherheit & Umwelt · Verhalten bei Notfällen · Allgemeine Vorschriften
