@@ -12,6 +12,8 @@ Prüfungskatalog, sondern trainieren das Verständnis der Regeln.
 - **🧭 Lernmodus** – Quiz-Runden pro Thema oder quer durch den Stoff, mit
   sofortigem Feedback und Erklärung zu jeder Frage
 - **🎓 Prüfungssimulation** – 30 zufällige Fragen, bestanden ab 80 %
+- **🗂️ 15 Übungsbögen** – feste Bögen à 20 Fragen mit Themenmix, bestanden
+  ab 75 % (wie an der echten Prüfung), mit Bestleistung pro Bogen
 - **🃏 Karteikarten (Leitner-System)** – falsch beantwortete Fragen kommen
   automatisch öfter, bis sie sitzen (5 Boxen: sofort / 1 / 3 / 7 / 14 Tage)
 - **🖼️ Visuelle Szenarien** – Vorfahrtssituationen zum Antippen,

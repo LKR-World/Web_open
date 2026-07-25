@@ -99,6 +99,15 @@ export const BADGES = [
     },
   },
   {
+    id: 'boegen-meister',
+    name: 'Bögen-Meister',
+    icon: '🗂️',
+    description: 'Alle 15 Übungsbögen bestanden.',
+    check(state) {
+      return Object.values(state.stats.sheets || {}).filter((s) => s.passed).length >= 15;
+    },
+  },
+  {
     id: 'kistenmeister',
     name: 'Kistenmeister',
     icon: '📦',
