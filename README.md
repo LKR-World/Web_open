@@ -19,7 +19,7 @@ Prüfungskatalog, sondern trainieren das Verständnis der Regeln.
 - **🏅 Gamification** – XP, nautische Ränge (Moses → Kapitän), Abzeichen und
   Tages-Streak
 
-## Themen (102 Fragen)
+## Themen (157 Fragen)
 
 Vorfahrtsregeln · Schifffahrtszeichen · Lichterführung · Manöver & Fahrregeln ·
 Sicherheit & Umwelt · Verhalten bei Notfällen · Allgemeine Vorschriften
